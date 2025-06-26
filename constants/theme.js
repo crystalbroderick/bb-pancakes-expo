@@ -1,3 +1,4 @@
+import { scale, verticalScale } from "@/utils/styling";
 
 export const COLORS = {
   primary: "#E0A840",
@@ -10,8 +11,8 @@ export const COLORS = {
   onPrimary: "#000000",
   onSecondary: "#fff",
   gray: "#808080",
+  lightGray: "#f2f2f2",
   darkGray: "#1E293B",
-  
 };
 
 export const themes = {
@@ -37,43 +38,96 @@ export const SPACING = {
   xl: 32,
 };
 
+export const spacingX = {
+  _3: scale(3),
+  _5: scale(5),
+  _7: scale(7),
+  _10: scale(10),
+  _12: scale(12),
+  _15: scale(15),
+  _20: scale(20),
+  _25: scale(25),
+  _30: scale(30),
+  _35: scale(35),
+  _40: scale(40),
+};
+
+export const spacingY = {
+  _5: verticalScale(5),
+  _7: verticalScale(7),
+  _10: verticalScale(10),
+  _12: verticalScale(12),
+  _15: verticalScale(15),
+  _17: verticalScale(17),
+  _20: verticalScale(20),
+  _25: verticalScale(25),
+  _30: verticalScale(30),
+  _35: verticalScale(35),
+  _40: verticalScale(40),
+  _50: verticalScale(50),
+  _60: verticalScale(60),
+};
+
+export const radius = {
+  _3: verticalScale(3),
+  _6: verticalScale(6),
+  _10: verticalScale(10),
+  _12: verticalScale(12),
+  _15: verticalScale(15),
+  _17: verticalScale(17),
+  _20: verticalScale(20),
+  _30: verticalScale(30),
+};
+
 export const RADIUS = {
   xs: 10,
   sm: 12,
   md: 14,
   lg: 16,
   xl: 18,
-}
+};
+
+// Inter: Inter_400Regular,
+// Inter_bold: Inter_700Bold,
+// Molle: Molle_400Regular_Italic,
+// Mont: Montserrat_400Regular,
+// Mont_semi: Montserrat_600SemiBold,
+// Mont_bold: Montserrat_700Bold,
+// Cherry: CherryCreamSoda_400Regular,
 
 export const FONTS = {
-title: {
-  fontSize: 28,
-  fontFamily: 'Molle',
-  color: COLORS.primary,
-},
- h1: {
-    fontSize: 24,
-    fontFamily: 'Cherry',
-    color: COLORS.primary
+  title: {
+    fontSize: 28,
+    fontFamily: "Molle",
+    color: COLORS.primary,
+  },
+  h1: {
+    fontSize: 28,
+    fontFamily: "Mont_bold",
+    color: COLORS.primary,
   },
   h2: {
     fontSize: 22,
-    fontFamily: 'Mont-bold',
+    fontFamily: "Mont_bold",
   },
   h3: {
     fontSize: 20,
-    fontFamily: 'Mont-bold',
+    fontFamily: "Mont_semi",
+  },
+  pageTitle: {
+    fontSize: 28,
+    fontFamily: "Inter",
   },
   body: {
     fontSize: 16,
   },
   caption: {
     fontSize: 12,
-    fontFamily: 'Cherry',
+    fontFamily: "Cherry",
   },
   buttonText: {
     fontSize: 14,
-    fontFamily: 'Mont_bold',
-    textTransform: 'uppercase'
+    fontFamily: "Mont_bold",
+    textTransform: "uppercase",
   },
-}
+};
