@@ -19,9 +19,8 @@ const InputField = ({
   icon,
   secureTextEntry = false,
 }) => {
-  const { theme, isLightMode } = useTheme();
+  const { theme, isLightTheme } = useTheme();
   const [isFocused, setIsFocused] = useState(false);
-
   return (
     <View style={[styles.container, style]}>
       {label ? (
@@ -46,7 +45,7 @@ const InputField = ({
                 color: textColor ?? theme.text,
                 borderColor: error ? "red" : isFocused ? theme.accent : theme.primary,
                 backgroundColor:
-                  !isLightMode || useDarkBackground
+                  !isLightTheme || useDarkBackground
                     ? COLORS.darkGray
                     : theme.background,
               },
