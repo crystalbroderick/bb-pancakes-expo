@@ -41,7 +41,6 @@ export const ThemeProvider = ({ children }) => {
 
   const isLightTheme = theme.mode === "light";
   const isDark = theme.mode === "dark";
-console.log("ThemeProvider initialized with theme:", theme.mode);
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme, isLightTheme, isDark }}>
