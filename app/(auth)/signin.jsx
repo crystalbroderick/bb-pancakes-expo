@@ -1,4 +1,4 @@
-import Btn from "@/components/Btn.js";
+import Btn from "@/components/Btn.jsx";
 import InputField from "@/components/forms/InputField";
 import { PasswordInput } from "@/components/forms/PasswordInput";
 import { COLORS, FONTS } from "@/constants/theme.js";
@@ -8,40 +8,49 @@ import { supabase } from "@/utils/supabase";
 import { Link, router } from "expo-router";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Image, StyleSheet, Text, View } from "react-native";
-import HorizontalDividerWithLabel from "../components/Divider";
-const SignupScreen = () => {
+import { Alert, Image, StyleSheet, Text, View } from "react-native";
+import HorizontalDividerWithLabel from "../../components/Divider";
+import SafeScreen from "../../components/SafeScreen";
+const SigninScreen = () => {
   const { session } = useAuth();
   const { theme } = useTheme();
-const [error, setError] = useState("")
+  const [error, setError] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const { control, handleSubmit } = useForm({defaultValues: {email: '', password: '',}});
+  const { control, handleSubmit } = useForm({
+    defaultValues: { email: "", password: "" },
+  });
 
-const onSubmit = async ({ email, password }) => {
+  const onSubmit = async ({ email, password }) => {
+    "Form values:", { email, password };
     setLoading(true);
-    const {
-      data: { session },
-      error,
-    } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-    });
 
-    if (error) setError(error.message);
-    setLoading(false);
-  }
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-
-  useEffect(() => { 
-    if(session) {
-      router.replace("/")
+      if (error) {
+        Alert.alert("Login failed", error.message);
+        setError(error.message);
+      }
+    } catch (err) {
+      console.error("Unexpected error in signInWithPassword:", err);
+    } finally {
+      setLoading(false);
     }
-  },[session])
+  };
+
+  useEffect(() => {
+    if (session) {
+      router.replace("/(tabs)/");
+    }
+  }, [session]);
   return (
-    <View style={[styles.container, { backgroundColor: theme.accent_blue }]}>
-      <View>
+    <SafeScreen bg={theme.accent_blue} paddingHorizontal>
+      <View style={styles.container}>
         {/* Form Header */}
         <View style={styles.titleRow}>
           <Image
@@ -50,7 +59,7 @@ const onSubmit = async ({ email, password }) => {
           />
 
           <View style={styles.textContainer}>
-            <Text style={[FONTS.title, { color: "white" }]}>Sign up</Text>
+            <Text style={[FONTS.title, { color: "white" }]}>Sign in</Text>
           </View>
         </View>
         {error && <Text style={styles.error}>*{error}</Text>}
@@ -75,12 +84,12 @@ const onSubmit = async ({ email, password }) => {
             useDarkBackground
           />
         </View>
-        <Btn title="Sign up" onPress={handleSubmit(onSubmit)}></Btn>
+        <Btn title="Sign in" onPress={handleSubmit(onSubmit)}></Btn>
         <HorizontalDividerWithLabel accent={theme.accent} textColor="white">
-          <Link href="/signin"> Already have an account? Sign in here</Link>
+          <Link href="/(auth)/signup"> New user? Sign up here</Link>
         </HorizontalDividerWithLabel>
       </View>
-    </View>
+    </SafeScreen>
   );
 };
 
@@ -125,8 +134,8 @@ const styles = StyleSheet.create({
     height: 70,
   },
   error: {
-    color: 'white'
-  }
+    color: "white",
+  },
 });
 
-export default SignupScreen;
+export default SigninScreen;

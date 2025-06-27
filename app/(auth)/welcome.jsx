@@ -1,39 +1,53 @@
-import Btn from "@/components/Btn.js";
+import Btn from "@/components/Btn.jsx";
 import SafeScreen from "@/components/SafeScreen";
-import ThemedText from "@/components/ThemedText";
 import { FONTS } from "@/constants/theme";
-import { router } from "expo-router";
+import { useTheme } from "@/context/ThemeContext";
+import { useRouter } from "expo-router";
+import { useEffect } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
+import Animated, { FadeIn } from "react-native-reanimated";
+import { useAuth } from "../../context/AuthContext";
 const WelcomeScreen = () => {
+  const router = useRouter();
+  const { theme } = useTheme();
+  const session = useAuth();
+  useEffect(() => {
+    if (session) {
+      router.replace("/(tabs)/");
+    }
+  }, [session]);
   return (
-    <SafeScreen>
-    <View style={[styles.container]}>
-      <Image
-        source={require("../assets/images/little-chef-yellow-sd.png")}
-        style={styles.chefImage}
-      />
-
-      <View style={styles.titleRow}>
+    <SafeScreen bg={theme.accent_blue}>
+      <View style={[styles.container]}>
         <Image
-          source={require("../assets/images/pancakes-logo.png")}
-          style={styles.logo}
+          source={require("@/assets/images/little-chef-yellow-sd.png")}
+          style={styles.chefImage}
         />
 
-        <View style={styles.textContainer}>
-          <Text style={FONTS.title}>BB Pancakes</Text>
-          <ThemedText style={[FONTS.caption]}>
-            Stack up your favorites
-          </ThemedText>
-        </View>
-      </View>
+        <View style={styles.titleRow}>
+          <Animated.Image
+            entering={FadeIn}
+            source={require("@/assets/images/pancakes-logo.png")}
+            style={styles.logo}
+            resizeMode="contain"
+          />
 
-      <Btn
-        style={styles.button}
-        title="Get Started"
-        onPress={() => router.navigate("/signin")}>
-        Let's get started!
-      </Btn>
-    </View>
+          <View style={styles.textContainer}>
+            <Text style={FONTS.title}>BB Pancakes</Text>
+            <Text style={[FONTS.caption, { color: "#fff" }]}>
+              Stack up your favorites
+            </Text>
+          </View>
+        </View>
+
+        <Btn
+          style={styles.button}
+          title="Get Started"
+          onPress={() => router.push("/(auth)/signup")}></Btn>
+        {/* <HorizontalDividerWithLabel accent={theme.accent} textColor="white">
+          <Link href="/signin"> Already have an account?</Link>
+        </HorizontalDividerWithLabel> */}
+      </View>
     </SafeScreen>
   );
 };
