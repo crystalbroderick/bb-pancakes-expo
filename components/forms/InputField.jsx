@@ -24,7 +24,11 @@ const InputField = ({
   return (
     <View style={[styles.container, style]}>
       {label ? (
-        <Text style={[FONTS.label, { color: textColor ?? theme.text, paddingVertical: 3 }]}>
+        <Text
+          style={[
+            FONTS.label,
+            { color: textColor ?? theme.text, paddingVertical: 3 },
+          ]}>
           {label}
         </Text>
       ) : null}
@@ -43,7 +47,11 @@ const InputField = ({
               styles.inputWrapper,
               {
                 color: textColor ?? theme.text,
-                borderColor: error ? "red" : isFocused ? theme.accent : theme.primary,
+                borderColor: error
+                  ? "red"
+                  : isFocused
+                  ? theme.accent
+                  : theme.primary,
                 backgroundColor:
                   !isLightTheme || useDarkBackground
                     ? COLORS.darkGray
