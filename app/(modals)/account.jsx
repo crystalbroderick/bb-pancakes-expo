@@ -3,15 +3,16 @@ import ThemedText from "@/components/ThemedText";
 import { COLORS, FONTS, radius, spacingX, spacingY } from "@/constants/theme";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
-import { Feather, Ionicons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { Alert, Image, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
+import Avatar from "../../components/Avatar";
 import Header from "../../components/Header";
 import SafeScreen from "../../components/SafeScreen";
 export default function AccountScreen() {
-  const { session, signout } = useAuth();
   const { toggleTheme, isLightTheme, theme } = useTheme();
   const router = useRouter();
+  const { user, signout } = useAuth();
 
   const showSignoutAlert = () => {
     Alert.alert("Confirm", "Are you sure you want to sign out?", [
@@ -31,21 +32,18 @@ export default function AccountScreen() {
         {/* Profile Section */}
         <ThemedText style={FONTS.h2}>Profile</ThemedText>
         <View style={[styles.profileCard, { backgroundColor: theme.input_bg }]}>
-          <Image
-            source={require("@/assets/images/defaultAvatar.png")}
-            style={styles.avatar}
-          />
+          <Avatar style={styles.avatar} uri={user?.avatar_url} />
           <View style={styles.userInfo}>
             <ThemedText style={styles.name}>
-              {session?.user?.user_metadata?.name || "User"}
+              {user?.display_name || "User"}
             </ThemedText>
             <ThemedText style={styles.email}>
-              {session?.user?.email || "user@email.com"}
+              {user?.email || "user@email.com"}
             </ThemedText>
           </View>
           <TouchableOpacity>
-            <Feather
-              name="edit-2"
+            <MaterialIcons
+              name="edit"
               size={18}
               color="#666"
               onPress={() => router.navigate("/edit-account")}
@@ -56,8 +54,8 @@ export default function AccountScreen() {
         <ThemedText style={FONTS.h3}>Settings</ThemedText>
         <View style={[styles.optionList, { backgroundColor: theme.input_bg }]}>
           <TouchableOpacity style={[styles.settingRow]} onPress={toggleTheme}>
-            <Ionicons
-              name="contrast-outline"
+            <MaterialIcons
+              name="contrast"
               size={20}
               color={COLORS.secondary}
               style={styles.icon}
@@ -71,8 +69,8 @@ export default function AccountScreen() {
         {/* Support Section */}
         <ThemedText style={FONTS.h3}>Support</ThemedText>
         <View style={[styles.optionList, { backgroundColor: theme.input_bg }]}>
-          <SettingItem icon="lock-closed" label="Privacy Settings" />
-          <SettingItem icon="information-circle-outline" label="About Us" />
+          <SettingItem icon="lock" label="Privacy Settings" />
+          <SettingItem icon="info" label="About Us" />
         </View>
         {/* Logout */}
         <Btn
@@ -88,7 +86,7 @@ export default function AccountScreen() {
 function SettingItem({ icon, label, onPress }) {
   return (
     <TouchableOpacity style={styles.settingRow} onPress={onPress}>
-      <Ionicons
+      <MaterialIcons
         name={icon}
         size={20}
         color={COLORS.secondary}
@@ -120,6 +118,7 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 25,
     marginRight: 12,
+    borderWidth: 0,
   },
   userInfo: {
     flex: 1,
