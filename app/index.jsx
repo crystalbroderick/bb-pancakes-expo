@@ -1,7 +1,7 @@
 import { COLORS } from "@/constants/theme";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "expo-router";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { StyleSheet, View } from "react-native";
 import Animated, {
   Easing,
@@ -11,8 +11,7 @@ import Animated, {
 } from "react-native-reanimated";
 const index = () => {
   const router = useRouter();
-  const { session } = useAuth();
-
+  const { session, loading } = useAuth();
   const opacity = useSharedValue(0);
   const scale = useSharedValue(0.8);
 
@@ -21,29 +20,33 @@ const index = () => {
     transform: [{ scale: scale.value }],
   }));
 
+  const hasRedirected = useRef(false);
+
   useEffect(() => {
-    // Run animation
+    if (loading || hasRedirected.current) return;
+
     opacity.value = withTiming(1, {
       duration: 800,
       easing: Easing.out(Easing.ease),
     });
-
     scale.value = withTiming(1, {
       duration: 800,
       easing: Easing.out(Easing.ease),
     });
 
-    // Wait 2s total (800ms animation + slight delay), then route based on session
     const timeout = setTimeout(() => {
       if (session) {
         router.replace("/(tabs)");
       } else {
+        console.log("need to log in!!");
         router.replace("/(auth)/welcome");
       }
+
+      hasRedirected.current = true;
     }, 2000);
 
     return () => clearTimeout(timeout);
-  }, [session]);
+  }, [loading, session]);
 
   return (
     <View style={styles.container}>
