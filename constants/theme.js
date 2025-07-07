@@ -2,7 +2,7 @@ import { scale, verticalScale } from "@/utils/styling";
 
 export const COLORS = {
   primary: "#E0A840",
-  primary_light: "#f5d497",
+  primary_light: "#e7bc6c",
   secondary: "#4078e0",
   black: "#000",
   white: "#fff",
@@ -20,12 +20,15 @@ export const themes = {
     mode: "light",
     background: "#FFFFFF",
     text: "#2D2C2C",
+    input_bg: "#f2f2f2",
     ...COLORS,
   },
   dark: {
     mode: "dark",
     background: "#253A4A",
     text: "#F8F8F8",
+    input_bg: "#1E293B",
+
     ...COLORS,
   },
 };
@@ -124,6 +127,10 @@ export const FONTS = {
   caption: {
     fontSize: 12,
     fontFamily: "Cherry",
+  },
+  label: {
+    fontSize: 14,
+    fontFamily: "Mont_semi",
   },
   buttonText: {
     fontSize: 14,
