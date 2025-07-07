@@ -1,63 +1,101 @@
-import { supabase } from "@/utils/supabase.js";
+import * as userService from "@/services/userService";
+import { supabase } from "@/utils/supabase";
 import { createContext, useContext, useEffect, useState } from "react";
-import { Alert, SafeAreaView, Text } from "react-native";
+import { Alert } from "react-native";
+
 const AuthContext = createContext();
 
-const AuthProvider = ({ children }) => {
-  const [loading, setLoading] = useState(false);
-  const [session, setSession] = useState(false);
+export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [session, setSession] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState(null);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-    });
+    const initUser = async () => {
+      setLoading(true);
+      try {
+        const { data: sessionData, error } = await supabase.auth.getSession();
+        const session = sessionData?.session;
 
-    // Listen to auth changes
+        if (!session?.user) {
+          setUser(null);
+          setSession(null);
+          return;
+        }
+
+        const profile = await userService.getUserProfile(session.user);
+
+        setSession(session);
+        setUser(profile); // merged meta_data and profile
+      } catch (err) {
+        console.error("Error loading user profile:", err);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initUser();
+
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
+        if (session) {
+          initUser(); // Re-fetch profile
+        } else {
+          setUser(null);
+          setSession(null);
+        }
       }
     );
 
-    // clean up to avoid memory leaks
-    return () => {
-      listener.subscription.unsubscribe();
-    };
+    return () => listener?.subscription?.unsubscribe();
   }, []);
+
+  const updateUser = (updates) => {
+    setUser((prev) => ({ ...prev, ...updates }));
+  };
+
+  const updateProfile = async (updates) => {
+    console.log("updating profile");
+    try {
+      setLoading(true);
+      await userService.updateUserProfile({ id: user.id, ...updates });
+      setUser((prev) => ({ ...prev, ...updates }));
+      setMessage("Successfully updated!");
+      setTimeout(() => setMessage(""), 3000);
+    } catch (error) {
+      Alert.alert("Profile Update Error", error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const signout = async () => {
     setLoading(true);
-    console.log("signing out...")
     const { error } = await supabase.auth.signOut();
-    if (error) {
-      Alert.alert("Error signing out", error.message);
-    } else {
-      setSession(null);
-      setUser(null);
-    }
+    if (error) Alert.alert("Signout Error", error.message);
+    setSession(null);
+    setUser(null);
     setLoading(false);
   };
 
-  const contextData = { session, signout };
   return (
-    <AuthContext.Provider value={contextData}>
-      {loading ? (
-        <SafeAreaView>
-          <Text>Loading..</Text>
-        </SafeAreaView>
-      ) : (
-        children
-      )}
+    <AuthContext.Provider
+      value={{
+        session,
+        user,
+        updateUser,
+        loading,
+        message,
+        signout,
+        updateProfile,
+      }}>
+      {children}
     </AuthContext.Provider>
   );
 };
 
-const useAuth = () => {
+export const useAuth = () => {
   return useContext(AuthContext);
 };
-
-export { AuthContext, AuthProvider, useAuth };
-
