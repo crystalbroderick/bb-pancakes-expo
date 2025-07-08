@@ -1,4 +1,3 @@
-import ThemedText from "@/components/ThemedText";
 import { COLORS, spacingX, spacingY } from "@/constants/theme";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
@@ -15,10 +14,11 @@ import InputField from "../../components/forms/InputField";
 import Header from "../../components/Header";
 import Loading from "../../components/Loading";
 import ModalWrapper from "../../components/ModalWrapper";
+import { uploadFile } from "../../services/imageService";
 export default function EditAccountScreen() {
   const { toggleTheme, isLightTheme, theme } = useTheme();
   const router = useRouter();
-  const { user, updateUser, updateProfile, loading, message } = useAuth();
+  const { user, updateUser, updateProfile, loading } = useAuth();
   const [localAvatarUri, setLocalAvatarUri] = useState(null);
 
   const { control, handleSubmit, reset, watch } = useForm({
@@ -54,26 +54,32 @@ export default function EditAccountScreen() {
     return user.display_name !== watch("display_name") || !!localAvatarUri;
   };
 
-  const onSubmit = (data) => {
-    console.log("pressed submit");
-    const nameUnchanged = user.display_name === data.display_name;
-    const avatarUnchanged = !localAvatarUri;
+  const onSubmit = async (data) => {
+    let avatarUrl = user.avatar_url;
 
-    if (nameUnchanged && avatarUnchanged) {
-      console.log("No changes to submit.");
-      return;
+    // Upload image
+    if (localAvatarUri) {
+      const avatarRes = await uploadFile("profiles", localAvatarUri);
+      if (avatarRes.success) {
+        avatarUrl = avatarRes.data;
+      } else {
+        console.log("Avatar upload failed");
+        return;
+      }
     }
-    console.log("user pressed update account");
-    console.log("local avatar:", localAvatarUri);
-    console.log("user avatar:", user.avatar_url);
-    updateProfile({
+
+    // Update both display name and avatar_url
+    const res = await updateProfile({
       display_name: data.display_name || user.display_name,
-      avatar_url: localAvatarUri || user.avatar_url,
+      avatar_url: avatarUrl,
     });
 
-    setLocalAvatarUri("");
+    if (res.success) {
+      router.back();
+    }
   };
-  console.log("hi");
+
+  let imageSource = localAvatarUri || user.avatar_url;
   return (
     <ModalWrapper bg={theme.background}>
       <Header title="Update Account"></Header>
@@ -81,15 +87,7 @@ export default function EditAccountScreen() {
       <ScrollView contentContainerStyle={styles.container}>
         <View style={{ alignItems: "center" }}>
           <View>
-            <Avatar
-              edit
-              size={135}
-              uri={localAvatarUri ? localAvatarUri : user.avatar_url}
-              // onUpload={(url) => {
-              //   setAvatarUrl(url);
-              //   updateProfile({ ...profile, avatar_url: url });
-              // }}
-            />
+            <Avatar edit size={135} uri={imageSource} />
 
             <TouchableOpacity
               style={styles.editIcon}
@@ -121,15 +119,6 @@ export default function EditAccountScreen() {
             onPress={handleSubmit(onSubmit)}
             disabled={!isFormDirty()}
           />
-        )}
-        {message && (
-          <ThemedText style={[styles.success]}>
-            {message}
-            <MaterialIcons
-              name="celebration"
-              size={30}
-              color={COLORS.primary}></MaterialIcons>
-          </ThemedText>
         )}
       </ScrollView>
     </ModalWrapper>

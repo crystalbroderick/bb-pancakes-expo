@@ -62,10 +62,10 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       await userService.updateUserProfile({ id: user.id, ...updates });
       setUser((prev) => ({ ...prev, ...updates }));
-      setMessage("Successfully updated!");
-      setTimeout(() => setMessage(""), 3000);
+      return { success: true };
     } catch (error) {
       Alert.alert("Profile Update Error", error.message);
+      return { success: false };
     } finally {
       setLoading(false);
     }
