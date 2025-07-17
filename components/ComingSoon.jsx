@@ -1,4 +1,4 @@
-import ThemedText from "@/components/ThemedText";
+import ThemedText from "@/components/theme/ThemedText";
 import { FONTS } from "@/constants/theme";
 import { Image, StyleSheet, Text, View } from "react-native";
 import HorizontalDividerWithLabel from "./Divider";
@@ -11,10 +11,11 @@ const ComingSoon = ({ name, details }) => {
           source={require("../assets/images/little-chef-smile-sd.png")}
           style={styles.chefImage}
         />
-        <HorizontalDividerWithLabel labelStyles={FONTS.h2}>{name}</HorizontalDividerWithLabel>
+        <HorizontalDividerWithLabel labelStyles={FONTS.h2}>
+          {name}
+        </HorizontalDividerWithLabel>
         <ThemedText style={FONTS.body}>{details}</ThemedText>
-                <Text style={FONTS.title}>Coming soon...</Text>
-
+        <Text style={FONTS.title}>Coming soon...</Text>
       </View>
     </SafeScreen>
   );
@@ -28,8 +29,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "column",
-    verticallySpaced:5,
-paddingHorizontal:30  },
+    verticallySpaced: 5,
+    paddingHorizontal: 30,
+  },
   chefImage: {
     width: "100%",
     height: 300,

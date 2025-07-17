@@ -1,21 +1,18 @@
-import Btn from "@/components/Btn.jsx";
+import { Btn } from "@/components/buttons";
 import SafeScreen from "@/components/SafeScreen";
 import { FONTS } from "@/constants/theme";
 import { useTheme } from "@/context/ThemeContext";
 import { useRouter } from "expo-router";
-import { useEffect } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
-import { useAuth } from "../../context/AuthContext";
 const WelcomeScreen = () => {
   const router = useRouter();
   const { theme } = useTheme();
-  const session = useAuth();
-  useEffect(() => {
-    if (session) {
-      router.replace("/(tabs)/");
-    }
-  }, [session]);
+  // useEffect(() => {
+  //   if (session) {
+  //     router.replace("/(tabs)/");
+  //   }
+  // }, [session]);
   return (
     <SafeScreen bg={theme.accent_blue}>
       <View style={[styles.container]}>
@@ -44,9 +41,6 @@ const WelcomeScreen = () => {
           style={styles.button}
           title="Get Started"
           onPress={() => router.push("/(auth)/signup")}></Btn>
-        {/* <HorizontalDividerWithLabel accent={theme.accent} textColor="white">
-          <Link href="/signin"> Already have an account?</Link>
-        </HorizontalDividerWithLabel> */}
       </View>
     </SafeScreen>
   );
@@ -93,92 +87,3 @@ const styles = StyleSheet.create({
     fontFamily: "Mont_bold",
   },
 });
-
-// const getStyles = (theme) =>
-//   StyleSheet.create({
-// container: {
-//     flex: 1,
-//     backgroundColor: theme.background,
-//     alignItems: "center",
-//     justifyContent: "center",
-//     flexDirection: "column",
-//   },
-//   chefImage: {
-//     width: "100%",
-//     height: 300,
-//     resizeMode: "contain",
-//   },
-//   titleRow: {
-//     flexDirection: "row",
-//     alignItems: "center",
-//     marginBottom: 20,
-//   },
-//   logo: {
-//     width: 70,
-//     height: 70,
-//     resizeMode: "contain",
-//   },
-//   textContainer: {
-//     justifyContent: "center",
-//   },
-//   slogan: {
-//     fontSize: 16,
-//   },
-//   button: {
-//     marginTop: 100,
-//     padding: 20,
-//     borderRadius: 10,
-//     width: "70%",
-//     alignItems: "center",
-//   },
-//   buttonText: {
-//     fontSize: 15,
-//     fontFamily: "Mont_bold",
-//     fontWeight: "600",
-//     textTransform: "uppercase",
-//   },
-//   });
-
-// const styles = {...useGlobalStyles(),
-//   container: {
-//     flex: 1,
-//     backgroundColor: theme.background,
-//     alignItems: "center",
-//     justifyContent: "center",
-//     flexDirection: "column",
-//   },
-//   chefImage: {
-//     width: "100%",
-//     height: 300,
-//     resizeMode: "contain",
-//   },
-//   titleRow: {
-//     flexDirection: "row",
-//     alignItems: "center",
-//     marginBottom: 20,
-//   },
-//   logo: {
-//     width: 70,
-//     height: 70,
-//     resizeMode: "contain",
-//   },
-//   textContainer: {
-//     justifyContent: "center",
-//   },
-//   slogan: {
-//     fontSize: 16,
-//   },
-//   button: {
-//     marginTop: 100,
-//     padding: 20,
-//     borderRadius: 10,
-//     width: "70%",
-//     alignItems: "center",
-//   },
-//   buttonText: {
-//     fontSize: 15,
-//     fontFamily: "Mont_bold",
-//     fontWeight: "600",
-//     textTransform: "uppercase",
-//   },
-// }

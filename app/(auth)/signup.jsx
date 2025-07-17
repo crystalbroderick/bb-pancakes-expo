@@ -1,6 +1,5 @@
-import Btn from "@/components/Btn.jsx";
-import InputField from "@/components/forms/InputField";
-import { PasswordInput } from "@/components/forms/PasswordInput";
+import { Btn } from "@/components/buttons";
+import { InputField, PasswordInput } from "@/components/forms";
 import { COLORS, FONTS } from "@/constants/theme.js";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
@@ -48,7 +47,7 @@ const SignupScreen = () => {
         <View style={styles.titleRow}>
           <Image
             source={require("@/assets/images/pancakes-logo.png")}
-            style={[styles.logo, { tintColor: COLORS.primary }]}
+            style={[styles.logo, { tintColor: COLORS.yellow }]}
           />
 
           <View style={styles.textContainer}>
@@ -80,7 +79,6 @@ const SignupScreen = () => {
         <Btn title="Sign up" onPress={handleSubmit(onSubmit)}></Btn>
         <HorizontalDividerWithLabel accent={theme.accent} textColor="white">
           <Link href="/(auth)/signin">
-            {" "}
             Already have an account? Sign in here
           </Link>
         </HorizontalDividerWithLabel>
