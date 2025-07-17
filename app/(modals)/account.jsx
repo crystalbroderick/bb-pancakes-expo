@@ -1,13 +1,13 @@
-import Btn from "@/components/Btn";
-import ThemedText from "@/components/ThemedText";
+import { Btn } from "@/components/buttons";
+import Avatar from "@/components/common/Avatar";
+import ThemedText from "@/components/theme/ThemedText";
 import { COLORS, FONTS, radius, spacingX, spacingY } from "@/constants/theme";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
-import Avatar from "../../components/Avatar";
-import Header from "../../components/Header";
+import Header from "../../components/common/Header";
 import SafeScreen from "../../components/SafeScreen";
 export default function AccountScreen() {
   const { toggleTheme, isLightTheme, theme } = useTheme();
@@ -24,9 +24,10 @@ export default function AccountScreen() {
       { text: "Sign out", onPress: signout, style: "destructive" },
     ]);
   };
+
   return (
     <SafeScreen paddingHorizontal>
-      <Header title="Account"></Header>
+      <Header title="Account" showBackButton></Header>
 
       <View style={styles.container}>
         {/* Profile Section */}
