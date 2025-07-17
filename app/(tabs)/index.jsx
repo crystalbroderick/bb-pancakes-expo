@@ -1,50 +1,45 @@
-import Header from "@/components/Header";
+import Header from "@/components/common/Header";
+import RecipeCard from "@/components/recipes/RecipeCard";
 import SafeScreen from "@/components/SafeScreen";
-import ThemedText from "@/components/ThemedText";
-import { FONTS } from "@/constants/theme";
-import { useFilteredRecipes } from "@/hooks/useFilteredRecipes";
+import ThemedText from "@/components/theme/ThemedText";
+import { TAGS } from "@/constants/tags";
+import { COLORS, FONTS, spacingX, spacingY } from "@/constants/theme";
+import { useTheme } from "@/context/ThemeContext";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link, router } from "expo-router";
 import { useState } from "react";
-import { FlatList, Text, TouchableOpacity, View } from "react-native";
-const allTags = ["breakfast", "dessert", "dinner", "vegetarian"];
-
+import { FlatList, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { ChipBtn, FloatingBtn } from "../../components/buttons";
+import FilterChipList from "../../components/recipes/FilterChipList";
+import { useAuth } from "../../context/AuthContext";
+import { useFilteredRecipes } from "../../hooks/useFilteredRecipes";
+import { getAllRecipes } from "../../services/recipeService";
 export default function Index() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTags, setSelectedTags] = useState([]);
   const [sortBy, setSortBy] = useState("newest");
-  const recipes = [
-    {
-      id: "1",
-      name: "Lemon Chicken Stir Fry",
-      ingredients: ["chicken breast", "broccoli", "lemon", "garlic"],
-      tags: ["dinner"],
-      favorite: true,
-      createdAt: "2025-06-18T10:00:00Z",
-      madeCount: 3,
-    },
-    {
-      id: "2",
-      name: "French Toast",
-      ingredients: ["bread", "egg", "milk", "cinnamon"],
-      tags: ["breakfast", "dessert"],
-      favorite: false,
-      createdAt: "2025-06-15T09:00:00Z",
-      madeCount: 2,
-    },
-    {
-      id: "3",
-      name: "Tofu Stir Fry",
-      ingredients: ["tofu", "carrot", "soy sauce"],
-      tags: ["vegetarian", "dinner"],
-      favorite: true,
-      createdAt: "2025-06-10T12:00:00Z",
-      madeCount: 5,
-    },
-  ];
+  const insets = useSafeAreaInsets();
+  const tabBarHeight = useBottomTabBarHeight();
+  const { theme } = useTheme();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
 
-  const filteredRecipes = useFilteredRecipes(recipes, {
-    searchTerm,
-    selectedTags,
-    sortBy,
+  const initalRecipes = queryClient.getQueryData(["recipes"]);
+
+  const {
+    isLoading,
+    isError,
+    data = [],
+    error,
+  } = useQuery({
+    queryKey: ["recipes"],
+    queryFn: () => getAllRecipes(user.id),
+    //cached after unmount
+    cacheTime: 1000 * 60 * 10, // 10 minutes in memory after last use
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    initialData: initalRecipes,
   });
 
   const toggleTag = (tag) => {
@@ -52,94 +47,137 @@ export default function Index() {
       prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
     );
   };
+  const recipes = data ?? [];
+
+  const filteredRecipes = useFilteredRecipes(recipes ?? [], {
+    searchTerm,
+    selectedTags,
+    sortBy,
+  });
 
   return (
     <SafeScreen paddingHorizontal>
-      <Header leftIcon={"logo"} title="Recipes" icon="setting" />
+      {isLoading ? (
+        <Text>Loading...</Text>
+      ) : isError ? (
+        <Text>Sorry! {error.message}</Text>
+      ) : (
+        <>
+          <Header
+            showLogo
+            title="Recipes"
+            avatar={user?.avatar_url}
+            showAvatar
+            size="24"
+          />
 
-      <View>
-        <ThemedText style={FONTS.h1}>Recipes</ThemedText>
-
-        {/* <TextInput
-        placeholder="Search recipes or ingredients"
-        value={searchTerm}
-        onChangeText={setSearchTerm}
-        style={{
-          borderWidth: 1,
-          padding: 8,
-          borderRadius: 6,
-          marginBottom: 12,
-        }}
-      /> */}
-
-        <View
-          style={{ flexDirection: "row", flexWrap: "wrap", marginBottom: 12 }}>
-          {allTags.map((tag) => (
-            <TouchableOpacity
-              key={tag}
-              onPress={() => toggleTag(tag)}
-              style={{
-                paddingHorizontal: 10,
-                paddingVertical: 6,
-                backgroundColor: selectedTags.includes(tag) ? "#444" : "#ccc",
-                borderRadius: 20,
-                marginRight: 8,
-                marginBottom: 8,
-              }}>
-              <Text
-                style={{ color: selectedTags.includes(tag) ? "#fff" : "#000" }}>
-                {tag}
-              </Text>
+          {/* TO DO: Search + Header */}
+          {/* <View style={styles.header}>
+            <ThemedText style={FONTS.h1}>Recipes</ThemedText>
+            <TouchableOpacity style={styles.searchIcon}>
+              <AntDesign name="search1" size={24} color={COLORS.white} />
             </TouchableOpacity>
-          ))}
-        </View>
+          </View> */}
 
-        {/* <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 }}>
-        <Button title="Newest" onPress={() => setSortBy('newest')} />
-        <Button title="Favorites" onPress={() => setSortBy('favorites')} />
-        <Button title="Most Made" onPress={() => setSortBy('mostMade')} />
-      </View> */}
+          {/* Horizontal Filter with Chips and arrow */}
+          <FilterChipList
+            tags={TAGS}
+            selectedTags={selectedTags}
+            onToggle={toggleTag}
+            theme={theme}
+          />
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "justify-center",
+              marginBottom: 12,
+            }}>
+            <ThemedText>Sort by: </ThemedText>
+            <ChipBtn
+              title="Newest"
+              onPress={() => setSortBy("newest")}
+              selected={sortBy === "newest"}
+            />
+            <ChipBtn
+              title="Favorites"
+              onPress={() => setSortBy("favorites")}
+              selected={sortBy === "favorites"}
+            />
+            {/* <Button title="Most Made" onPress={() => setSortBy('mostMade')} /> */}
+          </View>
 
-        <FlatList
-          data={filteredRecipes}
-          keyExtractor={(item) => item.id}
-          ListEmptyComponent={<Text>No matching recipes found.</Text>}
-          renderItem={({ item }) => (
-            <View
-              style={{
-                padding: 12,
-                borderWidth: 1,
-                borderRadius: 8,
-                marginBottom: 8,
-              }}>
-              <Text style={{ fontWeight: "bold" }}>{item.name}</Text>
-              <Text>Tags: {item.tags.join(", ")}</Text>
-              <Text>Ingredients: {item.ingredients.join(", ")}</Text>
-              {item.favorite && <Text>⭐ Favorite</Text>}
-            </View>
+          {filteredRecipes.length === 0 ? (
+            <ThemedText style={FONTS.h4}>
+              No matching recipes found with that criteria! Click the add button
+              or{" "}
+              <Link
+                href="/create-recipe"
+                style={{
+                  color: theme.primary,
+                  textDecorationLine: "underline",
+                }}>
+                here
+              </Link>
+            </ThemedText>
+          ) : (
+            <FlatList
+              data={filteredRecipes}
+              style={styles.flatListViewStyle}
+              showsVerticalScrollIndicator={false}
+              keyExtractor={(item) => item.recipe_id}
+              contentContainerStyle={{
+                paddingBottom: 100, // prevent bottom items from being cut off behind tab bar
+              }}
+              ListEmptyComponent={
+                <Text>
+                  No recipes found. Press the add button or{" "}
+                  <Link
+                    href="/create-recipe"
+                    style={{
+                      color: theme.primary,
+                      textDecorationLine: "underline",
+                    }}>
+                    here
+                  </Link>
+                </Text>
+              }
+              renderItem={({ item: recipe, index }) => (
+                <RecipeCard recipe={recipe} index={index} />
+              )}
+            />
           )}
-        />
-      </View>
+
+          <FloatingBtn
+            style={{
+              bottom: insets.bottom + tabBarHeight + spacingY._50,
+            }}
+            onPress={() => router.push("/create-recipe")}
+          />
+        </>
+      )}
     </SafeScreen>
   );
 }
 
-// const styles = StyleSheet.create({
-//   container: {
-//     paddingHorizontal: 20,
-//   },
-//   headline: {
-//     paddingVertical: 20,
-//   },
-//   button: {
-//     backgroundColor: "black",
-//     padding: 12,
-//     borderRadius: 6,
-//     alignItems: "center",
-//     margin: 20,
-//   },
-//   buttonText: {
-//     color: "white",
-//     fontSize: 18,
-//   },
-// });
+const styles = StyleSheet.create({
+  filterChipContainer: {
+    flexDirection: "row",
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: spacingY._10,
+  },
+  searchIcon: {
+    backgroundColor: COLORS.darkGray,
+    padding: spacingX._10,
+    borderRadius: 50,
+  },
+  flatListViewStyle: {
+    flex: 1,
+    marginTop: spacingY._10,
+    gap: spacingY._25,
+    marginBottom: spacingY._30,
+  },
+});
