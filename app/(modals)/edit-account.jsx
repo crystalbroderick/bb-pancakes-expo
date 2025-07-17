@@ -1,3 +1,4 @@
+import { Btn } from "@/components/buttons";
 import { COLORS, spacingX, spacingY } from "@/constants/theme";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
@@ -8,11 +9,10 @@ import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
-import Avatar from "../../components/Avatar";
-import Btn from "../../components/Btn";
+import Avatar from "../../components/common/Avatar";
+import Header from "../../components/common/Header";
+import Loading from "../../components/common/Loading";
 import InputField from "../../components/forms/InputField";
-import Header from "../../components/Header";
-import Loading from "../../components/Loading";
 import ModalWrapper from "../../components/ModalWrapper";
 import { uploadFile } from "../../services/imageService";
 export default function EditAccountScreen() {
@@ -82,7 +82,7 @@ export default function EditAccountScreen() {
   let imageSource = localAvatarUri || user.avatar_url;
   return (
     <ModalWrapper bg={theme.background}>
-      <Header title="Update Account"></Header>
+      <Header title="Update Account" showBackButton></Header>
 
       <ScrollView contentContainerStyle={styles.container}>
         <View style={{ alignItems: "center" }}>
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     bottom: spacingY._5,
     right: spacingY._7,
     borderRadius: 100,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.yellow,
     shadowColor: "#000",
     elevation: 10,
     padding: 4,
