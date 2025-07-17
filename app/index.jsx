@@ -11,7 +11,7 @@ import Animated, {
 } from "react-native-reanimated";
 const index = () => {
   const router = useRouter();
-  const { session, loading } = useAuth();
+  const { session, user, loading } = useAuth();
   const opacity = useSharedValue(0);
   const scale = useSharedValue(0.8);
 

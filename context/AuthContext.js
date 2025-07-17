@@ -1,5 +1,6 @@
 import * as userService from "@/services/userService";
 import { supabase } from "@/utils/supabase";
+import { router } from "expo-router";
 import { createContext, useContext, useEffect, useState } from "react";
 import { Alert } from "react-native";
 
@@ -12,22 +13,20 @@ export const AuthProvider = ({ children }) => {
   const [message, setMessage] = useState(null);
 
   useEffect(() => {
-    const initUser = async () => {
-      setLoading(true);
+    let lastFetchedId = null;
+
+    const initUser = async (session) => {
+      const userId = session?.user?.id;
+      if (!userId || userId === lastFetchedId) return;
+
+      console.log("Fetching profile for:", userId);
+      lastFetchedId = userId;
+
       try {
-        const { data: sessionData, error } = await supabase.auth.getSession();
-        const session = sessionData?.session;
-
-        if (!session?.user) {
-          setUser(null);
-          setSession(null);
-          return;
-        }
-
         const profile = await userService.getUserProfile(session.user);
-
         setSession(session);
-        setUser(profile); // merged meta_data and profile
+        setUser(profile);
+        console.log("user including profile:", profile);
       } catch (err) {
         console.error("Error loading user profile:", err);
         setUser(null);
@@ -36,18 +35,27 @@ export const AuthProvider = ({ children }) => {
       }
     };
 
-    initUser();
+    const handleSession = (session) => {
+      if (session) {
+        setLoading(true); // ✅ Always set loading before fetching
+        initUser(session);
+      } else {
+        lastFetchedId = null;
+        setUser(null);
+        setSession(null);
+        setLoading(false);
+      }
+    };
 
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
-        if (session) {
-          initUser(); // Re-fetch profile
-        } else {
-          setUser(null);
-          setSession(null);
-        }
+        handleSession(session);
       }
     );
+
+    supabase.auth.getSession().then(({ data }) => {
+      handleSession(data.session);
+    });
 
     return () => listener?.subscription?.unsubscribe();
   }, []);
@@ -62,6 +70,7 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       await userService.updateUserProfile({ id: user.id, ...updates });
       setUser((prev) => ({ ...prev, ...updates }));
+      setLoading(false);
       return { success: true };
     } catch (error) {
       Alert.alert("Profile Update Error", error.message);
@@ -74,9 +83,13 @@ export const AuthProvider = ({ children }) => {
   const signout = async () => {
     setLoading(true);
     const { error } = await supabase.auth.signOut();
-    if (error) Alert.alert("Signout Error", error.message);
-    setSession(null);
-    setUser(null);
+    if (error) {
+      Alert.alert("Signout Error", error.message);
+    } else {
+      setSession(null);
+      setUser(null);
+      router.replace("/(auth)/welcome");
+    }
     setLoading(false);
   };
 
