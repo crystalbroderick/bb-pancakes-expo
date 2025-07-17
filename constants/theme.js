@@ -1,15 +1,14 @@
 import { scale, verticalScale } from "@/utils/styling";
 
 export const COLORS = {
-  primary: "#E0A840",
-  primary_light: "#e7bc6c",
+  yellow: "#E0A840",
+  yellow_light: "#e7bc6c",
   secondary: "#4078e0",
   black: "#000",
   white: "#fff",
   accent: "#cb5f6f",
   accent_blue: "#253A4A",
-  onPrimary: "#000000",
-  onSecondary: "#fff",
+  onSecondary: "#ffffff",
   gray: "#808080",
   lightGray: "#f2f2f2",
   darkGray: "#1E293B",
@@ -18,17 +17,22 @@ export const COLORS = {
 export const themes = {
   light: {
     mode: "light",
+    primary: "#253A4A",
+    onPrimary: "#000000",
     background: "#FFFFFF",
     text: "#2D2C2C",
     input_bg: "#f2f2f2",
+    danger: "#FF0000",
     ...COLORS,
   },
   dark: {
     mode: "dark",
+    primary: "#E0A840",
+    onPrimary: "#FFFFFF",
     background: "#253A4A",
     text: "#F8F8F8",
     input_bg: "#1E293B",
-
+    danger: "#FF4E50",
     ...COLORS,
   },
 };
@@ -102,12 +106,12 @@ export const FONTS = {
   title: {
     fontSize: 28,
     fontFamily: "Molle",
-    color: COLORS.primary,
+    color: COLORS.yellow,
   },
   h1: {
     fontSize: 28,
     fontFamily: "Mont_bold",
-    color: COLORS.primary,
+    color: COLORS.yellow,
   },
   h2: {
     fontSize: 22,
@@ -117,20 +121,29 @@ export const FONTS = {
     fontSize: 20,
     fontFamily: "Mont_semi",
   },
+  h4: {
+    fontSize: 18,
+    fontFamily: "Mont_semi",
+  },
   pageTitle: {
     fontSize: 28,
     fontFamily: "Inter",
   },
   body: {
+    fontFamily: "Mont",
     fontSize: 16,
   },
   caption: {
     fontSize: 12,
     fontFamily: "Cherry",
   },
-  label: {
+  labelSemi: {
     fontSize: 14,
     fontFamily: "Mont_semi",
+  },
+  label: {
+    fontSize: 14,
+    fontFamily: "Mont",
   },
   buttonText: {
     fontSize: 14,
