@@ -3,7 +3,7 @@ import Octicons from "@expo/vector-icons/Octicons";
 import { useState } from "react";
 import { TouchableOpacity } from "react-native";
 import InputField from "./InputField";
-export const PasswordInput = (props) => {
+const PasswordInput = (props) => {
   const [showPassword, setShowPassword] = useState(false);
   return (
     <InputField
@@ -25,3 +25,5 @@ export const PasswordInput = (props) => {
     />
   );
 };
+
+export default PasswordInput;

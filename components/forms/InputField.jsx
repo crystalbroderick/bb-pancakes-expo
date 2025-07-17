@@ -18,71 +18,84 @@ const InputField = ({
   type = "text",
   icon,
   secureTextEntry = false,
+  hideError = false,
+  ...props
 }) => {
   const { theme, isLightTheme } = useTheme();
   const [isFocused, setIsFocused] = useState(false);
   return (
-    <View style={[styles.container, style]}>
-      {label ? (
-        <Text
-          style={[
-            FONTS.label,
-            { color: textColor ?? theme.text, paddingVertical: 3 },
-          ]}>
-          {label}
-        </Text>
-      ) : null}
+    <Controller
+      control={control}
+      name={name}
+      rules={rules}
+      defaultValue={defaultValue}
+      render={({
+        field: { onChange, onBlur, value },
+        fieldState: { error },
+      }) => (
+        <View style={[styles.container, style]}>
+          {label || (error && !hideError) ? (
+            <Text
+              style={[
+                FONTS.label,
+                { color: textColor ?? theme.text, paddingVertical: 3 },
+              ]}>
+              {label}{" "}
+              {error && !hideError && (
+                <Text style={[FONTS.labelSemi, { color: theme.danger }]}>
+                  {error.message}
+                </Text>
+              )}
+            </Text>
+          ) : null}
 
-      <Controller
-        control={control}
-        name={name}
-        rules={rules}
-        defaultValue={defaultValue}
-        render={({
-          field: { onChange, onBlur, value },
-          fieldState: { error },
-        }) => (
           <View
             style={[
               styles.inputWrapper,
               {
                 color: textColor ?? theme.text,
                 borderColor: error
-                  ? "red"
+                  ? theme.danger
                   : isFocused
                   ? theme.accent
                   : theme.primary,
-                backgroundColor:
-                  !isLightTheme || useDarkBackground
-                    ? COLORS.darkGray
-                    : theme.background,
+                backgroundColor: readOnly
+                  ? COLORS.gray
+                  : !isLightTheme || useDarkBackground
+                  ? COLORS.darkGray
+                  : theme.lightGray,
               },
             ]}>
+            {/* {error && <Text style={styles.error}>{error.message}</Text>} */}
+
             <TextInput
               style={[
                 styles.input,
-                { color: textColor ?? theme.text },
-                readOnly && styles.readOnly,
+                style,
+                { color: readOnly ? "#ffffff" : textColor ?? theme.text },
               ]}
               onFocus={() => setIsFocused(true)}
               placeholder={placeholder}
-              placeholderTextColor={theme.text}
+              placeholderTextColor={theme.gray}
               onBlur={(e) => {
                 setIsFocused(false);
                 onBlur?.(e);
               }}
-              onChangeText={onChange}
+              onChangeText={(text) => {
+                const parsed = keyboardType === "numeric" ? Number(text) : text;
+                onChange(parsed);
+              }}
               value={value}
               editable={!readOnly}
               keyboardType={keyboardType}
               secureTextEntry={secureTextEntry}
+              {...props}
             />
             {icon}
-            {error && <Text style={styles.error}>{error.message}</Text>}
           </View>
-        )}
-      />
-    </View>
+        </View>
+      )}
+    />
   );
 };
 
@@ -98,6 +111,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 10,
+    elevation: 3,
+    shadowColor: "black",
   },
   input: {
     borderRadius: 8,
@@ -109,8 +124,6 @@ const styles = StyleSheet.create({
   },
   error: {
     color: "red",
-    fontSize: 12,
-    marginTop: 4,
   },
   readOnly: {
     backgroundColor: "#eee",
