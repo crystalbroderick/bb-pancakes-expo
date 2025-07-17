@@ -11,7 +11,7 @@ export const getSupabaseFileUrl = (filePath) => {
 };
 
 export const getUserImageSrc = (imagePath) => {
-  if (!imagePath) {
+  if (!imagePath || imagePath === null || imagePath === "undefined") {
     return require("@/assets/images/little-chef-plate.jpg");
   }
 
