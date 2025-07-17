@@ -1,20 +1,23 @@
 // app/(tabs)/_layout.js
+import { FONTS, spacingY } from "@/constants/theme";
 import { useTheme } from "@/context/ThemeContext"; // update path if different
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs, usePathname, useRouter } from "expo-router";
 import {
   StyleSheet,
   Text,
-  TouchableHighlight,
   TouchableOpacity,
   useWindowDimensions,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 export default function TabsLayout() {
   const router = useRouter();
   const pathname = usePathname();
   const { theme, isLightTheme } = useTheme();
   const { width } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
 
   const isCreatePage = pathname === "/create";
   return (
@@ -33,7 +36,8 @@ export default function TabsLayout() {
                 width: width * 0.9,
                 borderRadius: 15,
                 position: "absolute",
-                bottom: 25,
+                bottom: insets.bottom + spacingY._10,
+
                 alignSelf: "center",
                 shadowColor: "#000",
                 shadowOffset: { width: 0, height: 3 },
@@ -98,18 +102,18 @@ export default function TabsLayout() {
                         isFocused
                           ? isLightTheme
                             ? theme.white
-                            : theme.onPrimary
+                            : theme.darkGray
                           : theme.gray
                       }
                     />
                     <Text
                       style={[
-                        styles.tabText,
+                        FONTS.label,
                         {
                           color: isFocused
                             ? isLightTheme
                               ? theme.white
-                              : theme.onPrimary
+                              : theme.darkGray
                             : "gray",
                         },
                       ]}>
@@ -121,15 +125,15 @@ export default function TabsLayout() {
             })()}
 
             {/* Custom FAB center button, only show if not on /create */}
-            {!isCreatePage && (
+            {/* {!isCreatePage && (
               <TouchableHighlight
-                onPress={() => router.push("/create")}
+                onPress={() => router.push("/create-recipe")}
                 style={styles.fabButton}
                 underlayColor={theme.secondary}
                 activeOpacity={0.7}>
                 <Ionicons name="add" size={32} color="white" />
               </TouchableHighlight>
-            )}
+            )} */}
           </View>
         );
       }}
@@ -170,38 +174,3 @@ const styles = StyleSheet.create({
     fontFamily: "Inter",
   },
 });
-
-//   return (
-//       <><Tabs
-//         screenOptions={{ tabBarActiveTintColor: "blue", headerShown: false }}>
-//         <Tabs.Screen
-//           name="index"
-//           options={{
-//             title: "Recipes",
-//             tabBarIcon: ({ color }) => (
-//               <Ionicons size={28} name="book" color={color} />
-//             ),
-//           }}
-//         />
-//         <Tabs.Screen
-//           name="create"
-//           options={{
-//             title: "Create",
-//             tabBarIcon: ({ color }) => (
-//               <Ionicons size={28} name="add-circle" color={color} />
-//             ),
-//           }}
-//         />
-//         <Tabs.Screen
-//           name="settings"
-//           options={{
-//             title: "Settings",
-//             tabBarIcon: ({ color }) => (
-//               <Ionicons size={28} name="cog" color={color} />
-//             ),
-//           }}
-//         />
-//       </Tabs>
-//   </>
-//   );
-// }
