@@ -11,6 +11,7 @@ import {
   Montserrat_600SemiBold,
   Montserrat_700Bold,
 } from "@expo-google-fonts/montserrat";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
@@ -28,6 +29,8 @@ export default function RootLayout() {
   });
   SplashScreen.preventAutoHideAsync();
 
+  const queryClient = new QueryClient();
+
   useEffect(() => {
     if (loaded || error) {
       SplashScreen.hideAsync();
@@ -39,10 +42,12 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <Stack screenOptions={{ headerShown: false }} />
-      </AuthProvider>
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <AuthProvider>
+          <Stack screenOptions={{ headerShown: false }} />
+        </AuthProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }
