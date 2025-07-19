@@ -7,20 +7,23 @@ export const TAGS = [
   "dinner",
   "vegetarian",
   "vegan",
+  "drinks",
   "other",
 ];
 
 export const TAG_STYLES = {
   breakfast: {
     color: "#e7bc6c",
-    icon: <FontAwesome5 name="coffee" size={12} color="#000000" />,
+    icon: (
+      <MaterialCommunityIcons name="food-croissant" size={14} color="#000000" />
+    ),
   },
   lunch: {
     color: "#F76C5E",
     icon: <FontAwesome5 name="hamburger" size={12} color="#000000" />,
   },
   dinner: {
-    color: "#4078e0",
+    color: "#3360b3",
     icon: <MaterialCommunityIcons name="food" size={14} color="#000000" />,
   },
   dessert: {
@@ -34,6 +37,10 @@ export const TAG_STYLES = {
   vegetarian: {
     color: "#6FB48A",
     icon: <FontAwesome5 name="carrot" size={12} color="#000000" />,
+  },
+  drinks: {
+    color: "#b45c84ff",
+    icon: <FontAwesome5 name="coffee" size={12} color="#ffffff" />,
   },
   other: {
     color: "#744583ff",
