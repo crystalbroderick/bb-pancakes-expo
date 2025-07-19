@@ -12,6 +12,7 @@ import { useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ChipBtn, FloatingBtn } from "../../components/buttons";
+import Loading from "../../components/common/Loading";
 import FilterChipList from "../../components/recipes/FilterChipList";
 import { useAuth } from "../../context/AuthContext";
 import { useFilteredRecipes } from "../../hooks/useFilteredRecipes";
@@ -25,20 +26,18 @@ export default function Index() {
   const { theme } = useTheme();
   const { user } = useAuth();
   const queryClient = useQueryClient();
-
-  const initalRecipes = queryClient.getQueryData(["recipes"]);
-
+  const initalRecipes = queryClient.getQueryData(["recipes", user?.id]);
   const {
     isLoading,
     isError,
     data = [],
     error,
   } = useQuery({
-    queryKey: ["recipes"],
+    queryKey: ["recipes", user?.id],
     queryFn: () => getAllRecipes(user.id),
     //cached after unmount
-    cacheTime: 1000 * 60 * 10, // 10 minutes in memory after last use
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: Infinity, // never auto-refetch
+    cacheTime: 1000 * 60 * 60 * 24, // 24 hours
     initialData: initalRecipes,
   });
 
@@ -58,7 +57,7 @@ export default function Index() {
   return (
     <SafeScreen paddingHorizontal>
       {isLoading ? (
-        <Text>Loading...</Text>
+        <Loading></Loading>
       ) : isError ? (
         <Text>Sorry! {error.message}</Text>
       ) : (
