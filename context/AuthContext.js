@@ -1,5 +1,6 @@
 import * as userService from "@/services/userService";
 import { supabase } from "@/utils/supabase";
+import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { createContext, useContext, useEffect, useState } from "react";
 import { Alert } from "react-native";
@@ -11,6 +12,7 @@ export const AuthProvider = ({ children }) => {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState(null);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     let lastFetchedId = null;
@@ -86,8 +88,11 @@ export const AuthProvider = ({ children }) => {
     if (error) {
       Alert.alert("Signout Error", error.message);
     } else {
+      queryClient.invalidateQueries(["recipes", user.id]); // or ['recipes', userId] if using user-specific keys
+
       setSession(null);
       setUser(null);
+
       router.replace("/(auth)/welcome");
     }
     setLoading(false);
