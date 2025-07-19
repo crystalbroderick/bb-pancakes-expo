@@ -267,3 +267,12 @@ export const deleteFavorite = async ({ profile_id, recipe_id }) => {
     throw error;
   }
 };
+
+export const deleteRecipe = async (recipeId) => {
+  const { error } = await supabase
+    .from("recipes")
+    .delete()
+    .eq("recipe_id", recipeId);
+
+  if (error) throw error;
+};

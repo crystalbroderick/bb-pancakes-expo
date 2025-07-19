@@ -8,16 +8,23 @@ import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { createFavorite, deleteFavorite } from "../../services/recipeService";
+import { useAuth } from "../../context/AuthContext";
+import {
+  createFavorite,
+  deleteFavorite,
+  deleteRecipe,
+} from "../../services/recipeService";
 
 const RecipeCard = ({ recipe, index }) => {
-  const { isLightTheme } = useTheme();
+  const { isLightTheme, theme } = useTheme();
   const tags = recipe.tags || ["other"];
+  const { user } = useAuth();
   const baseColor = TAG_STYLES[tags[0]]?.color || TAG_STYLES.default.color;
   const gradientColors =
     tags.length > 1
       ? tags.map((tag) => TAG_STYLES[tag]?.color).filter(Boolean)
       : null;
+  const queryClient = useQueryClient();
 
   const renderTagChips = () =>
     tags.map((tag) => {
@@ -50,7 +57,7 @@ const RecipeCard = ({ recipe, index }) => {
         }>
         <FontAwesome5 name="edit" size={18} color={COLORS.black} />
       </Pressable>
-      <Pressable onPress={() => console.log("Delete")}>
+      <Pressable onPress={showDeleteAlert}>
         <FontAwesome5 name="trash" size={18} color={COLORS.black} />
       </Pressable>
     </View>
@@ -71,18 +78,40 @@ const RecipeCard = ({ recipe, index }) => {
       }
     },
     onSuccess: () => {
-      // This makes React Query re-fetch the updated data
-      utils.invalidateQueries(["recipes"]);
+      // React Query re-fetch the updated data
+      utils.invalidateQueries(["recipes", user.id]);
     },
     onError: () => {
       Alert.alert("Error", "Could not update favorite.");
     },
   });
 
+  const showDeleteAlert = () => {
+    Alert.alert("Confirm", `Are you sure you want to delete ${recipe.name}?`, [
+      {
+        text: "cancel",
+        onPress: console.log("cancel logout"),
+        style: "cancel",
+      },
+      { text: "Delete", onPress: handleDelete, style: "destructive" },
+    ]);
+  };
+
+  const handleDelete = async () => {
+    try {
+      await deleteRecipe(recipe.recipe_id);
+      Alert.alert("Deleted!", "Recipe deleted successfully.");
+      // Invalidate or refetch recipes list so UI updates
+      queryClient.invalidateQueries(["recipes", user.id]);
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    }
+  };
+
   const openRecipeDetails = () => {
     router.push({
       pathname: "recipe-details",
-      params: { id: recipe.recipe_id },
+      params: { id: recipe.recipe_id, isFavorite: recipe.isFavorite },
     });
   };
 
@@ -92,7 +121,7 @@ const RecipeCard = ({ recipe, index }) => {
         entering={FadeInDown.delay(index * 50)
           .springify()
           .damping(20)}>
-        <View style={styles.card}>
+        <View style={[styles.card, { backgroundColor: theme.input_bg }]}>
           {/* Gradient Top Background (if multiple tags) */}
           {gradientColors ? (
             <LinearGradient
@@ -113,7 +142,7 @@ const RecipeCard = ({ recipe, index }) => {
             style={[
               styles.innerBox,
               {
-                backgroundColor: isLightTheme ? COLORS.white : COLORS.darkGray,
+                backgroundColor: theme.input_bg,
               },
             ]}>
             <ThemedText style={FONTS.h3} numberOfLines={2}>
@@ -137,6 +166,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     elevation: 3,
     borderWidth: 1,
+    borderTopWidth: 0,
     borderColor: "rgba(0, 0, 0, 0.1)", // subtle border
   },
 
