@@ -8,6 +8,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
 import Header from "../../components/common/Header";
+import SubHeader from "../../components/common/SubHeader";
 import SafeScreen from "../../components/SafeScreen";
 export default function AccountScreen() {
   const { toggleTheme, isLightTheme, theme } = useTheme();
@@ -31,7 +32,7 @@ export default function AccountScreen() {
 
       <View style={styles.container}>
         {/* Profile Section */}
-        <ThemedText style={FONTS.h2}>Profile</ThemedText>
+        <SubHeader fontStyle={FONTS.h3}>Profile</SubHeader>
         <View style={[styles.profileCard, { backgroundColor: theme.input_bg }]}>
           <Avatar style={styles.avatar} uri={user?.avatar_url} />
           <View style={styles.userInfo}>
@@ -52,7 +53,7 @@ export default function AccountScreen() {
           </TouchableOpacity>
         </View>
         {/*Settings Section */}
-        <ThemedText style={FONTS.h3}>Settings</ThemedText>
+        <SubHeader fontStyle={FONTS.h3}>Settings</SubHeader>
         <View style={[styles.optionList, { backgroundColor: theme.input_bg }]}>
           <TouchableOpacity style={[styles.settingRow]} onPress={toggleTheme}>
             <MaterialIcons
@@ -68,10 +69,18 @@ export default function AccountScreen() {
         </View>
 
         {/* Support Section */}
-        <ThemedText style={FONTS.h3}>Support</ThemedText>
+        <SubHeader fontStyle={FONTS.h3}>Support</SubHeader>
         <View style={[styles.optionList, { backgroundColor: theme.input_bg }]}>
-          <SettingItem icon="lock" label="Privacy Settings" />
-          <SettingItem icon="info" label="About Us" />
+          <SettingItem
+            icon="lock"
+            label="Privacy Settings"
+            onPress={() => router.navigate("/privacy")}
+          />
+          <SettingItem
+            icon="info"
+            label="About Us"
+            onPress={() => router.navigate("/about")}
+          />
         </View>
         {/* Logout */}
         <Btn
