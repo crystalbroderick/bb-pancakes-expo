@@ -12,11 +12,12 @@ const Header = ({
   iconColor = "#808080",
   avatar,
   showAvatar = false,
+  style = {},
 }) => {
   const { theme } = useTheme();
   return (
     <View style={[styles.container]}>
-      <View style={styles.leftSide}>
+      <View style={[styles.leftSide, style]}>
         {showBackButton ? (
           <BackBtn />
         ) : (
