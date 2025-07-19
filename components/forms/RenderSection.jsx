@@ -1,10 +1,10 @@
-import ThemedText from "@/components/theme/ThemedText";
 import { FONTS, spacingY } from "@/constants/theme";
 import { Text, View } from "react-native";
+import SubHeader from "../common/SubHeader";
 
 const RenderSection = ({ title, children, error, textStyle = {} }) => (
   <View style={{ paddingVertical: spacingY._05 }}>
-    <ThemedText style={[FONTS.h2]}>{title}</ThemedText>
+    <SubHeader>{title}</SubHeader>
     {error && <Text style={[FONTS.labelSemi, textStyle]}>{error}</Text>}
     {children}
   </View>

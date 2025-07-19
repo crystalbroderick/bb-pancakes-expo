@@ -22,6 +22,7 @@ import { useEffect, useMemo } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import Loading from "../../components/common/Loading";
+import SubHeader from "../../components/common/SubHeader";
 
 const EditRecipeScreen = () => {
   const router = useRouter();
@@ -37,6 +38,7 @@ const EditRecipeScreen = () => {
     enabled: !!id,
     initialData: fallbackData,
     staleTime: 1000 * 60 * 5, // 5 minutes
+    cacheTime: 1000 * 60 * 5,
   });
 
   const {
@@ -93,7 +95,7 @@ const EditRecipeScreen = () => {
     onSuccess: () => {
       console.log("✅ Recipe updated!");
       queryClient.invalidateQueries({ queryKey: ["recipe", id] });
-      queryClient.invalidateQueries({ queryKey: ["recipes"] });
+      queryClient.invalidateQueries({ queryKey: ["recipes", user.id] });
       router.back();
     },
     onError: (err) => {
@@ -126,8 +128,8 @@ const EditRecipeScreen = () => {
       <ScrollView
         contentContainerStyle={{ gap: 10 }}
         showsVerticalScrollIndicator={false}>
-        <View>
-          <ThemedText style={[FONTS.h2]}>Basic Info</ThemedText>
+        <View style={{ paddingVertical: spacingY._05 }}>
+          <SubHeader>Basic Info</SubHeader>
 
           {/* Basic Info */}
           <InputField

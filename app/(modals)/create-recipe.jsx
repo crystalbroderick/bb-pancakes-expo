@@ -19,8 +19,8 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Btn } from "../../components/buttons";
 import Header from "../../components/common/Header";
+import SubHeader from "../../components/common/SubHeader";
 import { useAuth } from "../../context/AuthContext";
-
 import { createAndGetRecipe } from "../../services/recipeService";
 const CreateRecipeScreen = () => {
   const queryClient = useQueryClient();
@@ -108,7 +108,7 @@ const CreateRecipeScreen = () => {
     },
     onSuccess: (newRecipe) => {
       console.log("Recipe created!", newRecipe);
-      queryClient.invalidateQueries({ queryKey: ["recipes"] }); // refetch all recipes
+      queryClient.invalidateQueries({ queryKey: ["recipes", user.id] }); // refetch all recipes
       router.back();
     },
     onError: (err) => {
@@ -137,7 +137,7 @@ const CreateRecipeScreen = () => {
         showsVerticalScrollIndicator={false}>
         {/*Basic Info Section */}
         <View>
-          <ThemedText style={[FONTS.h2]}>Basic Info</ThemedText>
+          <SubHeader>Basic Info</SubHeader>
           <InputField
             name="name"
             control={control}
