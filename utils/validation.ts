@@ -32,11 +32,12 @@ export const RecipeSchema = z.object({
     .max(500, { message: "Description is too long." })
     .optional(),
   // sourceUrl: z.string().url({ message: "Invalid URL." }).optional(),
-  // author: z
-  //   .string()
-  //   .max(50, { message: "Author name is too long." })
-  //   .optional(),
-
+  sourceName: z
+    .string()
+    .max(50, { message: "Author name is too long." })
+    .optional(),
+  sourceUrl: z.string().optional(),
+  imageUrl: z.url().optional(),
   ingredients: z
     .array(
       z.object({
