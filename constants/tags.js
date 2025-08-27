@@ -2,6 +2,8 @@ import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 
 export const TAGS = [
   "breakfast",
+  "main",
+  "sides",
   "dessert",
   "lunch",
   "dinner",
@@ -19,11 +21,11 @@ export const TAG_STYLES = {
     ),
   },
   lunch: {
-    color: "#F76C5E",
+    color: "#3360b3",
     icon: <FontAwesome5 name="hamburger" size={12} color="#000000" />,
   },
   dinner: {
-    color: "#3360b3",
+    color: "#6C97E7",
     icon: <MaterialCommunityIcons name="food" size={14} color="#000000" />,
   },
   dessert: {
@@ -39,11 +41,19 @@ export const TAG_STYLES = {
     icon: <FontAwesome5 name="carrot" size={12} color="#000000" />,
   },
   drinks: {
+    color: "#B95EF7",
+    icon: <FontAwesome5 name="coffee" size={12} color="#ffffff" />,
+  },
+  main: {
     color: "#b45c84ff",
     icon: <FontAwesome5 name="coffee" size={12} color="#ffffff" />,
   },
+  sides: {
+    color: "#F76C5E",
+    icon: <FontAwesome5 name="coffee" size={12} color="#ffffff" />,
+  },
   other: {
-    color: "#744583ff",
+    color: "#a673b8ff",
     icon: (
       <MaterialCommunityIcons
         name="food-fork-drink"
@@ -53,7 +63,7 @@ export const TAG_STYLES = {
     ),
   },
   default: {
-    color: "#D3D3D3",
+    color: "#cf3737ff",
     icon: <FontAwesome5 name="utensils" size={12} color="#333" />,
   },
 };
