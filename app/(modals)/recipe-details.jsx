@@ -3,7 +3,7 @@ import { FONTS, spacingX, spacingY } from "@/constants/theme";
 import { useTheme } from "@/context/ThemeContext";
 import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useLocalSearchParams } from "expo-router";
+import { Link, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ScrollView,
@@ -14,11 +14,11 @@ import {
 } from "react-native";
 import BackBtn from "../../components/buttons/BackBtn";
 import Loading from "../../components/common/Loading";
+import RecipeImage from "../../components/common/RecipeImage";
 import SubHeader from "../../components/common/SubHeader";
 import IngredientItem from "../../components/recipes/IngredientItem";
 import StepItem from "../../components/recipes/StepItem";
 import SafeScreen from "../../components/SafeScreen";
-import { TAG_STYLES } from "../../constants/tags";
 import { getRecipe } from "../../services/recipeService";
 const RecipeDetailsScreen = () => {
   const { id, isFavorite: isFavoriteParam } = useLocalSearchParams();
@@ -46,7 +46,7 @@ const RecipeDetailsScreen = () => {
     setIsFavorite(isFavoriteParam === "true");
   }, [isFavoriteParam]);
 
-  if (isLoading || !recipe)
+  if (isLoading)
     return (
       <Loading loading={isLoading} loadingText="Loading recipe.."></Loading>
     );
@@ -56,8 +56,8 @@ const RecipeDetailsScreen = () => {
         <ThemedText>Sorry! {error.message}</ThemedText>
       </SafeScreen>
     );
-  const firstTag = recipe.tags?.[0];
-  const tagStyle = TAG_STYLES[firstTag] || TAG_STYLES.default;
+  // const firstTag = recipe.tags?.[0];
+  // const tagStyle = TAG_STYLES[firstTag] || TAG_STYLES.default;
 
   const renderTimeCards = () => (
     <View style={styles.timesContainer}>
@@ -90,11 +90,12 @@ const RecipeDetailsScreen = () => {
               size={16}
               color="black"
             />
-            <Text style={[FONTS.label, { fontWeight: "bold", marginStart: 4 }]}>
+            <Text
+              style={[FONTS.labelSemi, { fontWeight: "bold", marginStart: 4 }]}>
               {label}:
             </Text>
           </View>
-          <Text style={{ marginTop: 4 }}>{time} mins</Text>
+          <Text style={[FONTS.label, { marginTop: 4 }]}>{time} mins</Text>
         </View>
       ))}
     </View>
@@ -102,13 +103,13 @@ const RecipeDetailsScreen = () => {
 
   return (
     <SafeScreen
-      style={{ flex: 1, backgroundColor: tagStyle.color, paddingVertical: 0 }}>
+      style={{ flex: 1, backgroundColor: theme.input_bg, paddingVertical: 0 }}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         {/* Top Area
           TO DO: add options (delete, edit) */}
         <View
           style={{
-            backgroundColor: tagStyle.color,
+            backgroundColor: theme.input_bg,
             paddingBottom: 40,
             paddingHorizontal: spacingX._20,
           }}>
@@ -130,16 +131,33 @@ const RecipeDetailsScreen = () => {
             borderTopRightRadius: 40,
             padding: 20,
             flexGrow: 1,
+            alginItems: "stretch",
           }}>
+          {/* Circular image */}
+          <View style={styles.imageWrapper}>
+            <View style={styles.imagePlaceholder}>
+              <RecipeImage uri={recipe.image_url} style={[styles.image]} />
+            </View>
+          </View>
           {/* Basic Info */}
-          <SubHeader fontStyle={FONTS.h1} color={tagStyle.color}>
-            {recipe.name}
+          <SubHeader
+            fontStyle={FONTS.h1}
+            color={theme.yellow}
+            viewStyle={{
+              paddingTop: "50",
+              marginBottom: 0,
+            }}>
+            <ThemedText style={FONTS.h1}>{recipe.name}</ThemedText>
           </SubHeader>
-
+          {recipe.source_name && recipe.source_url && (
+            <ThemedText style={[FONTS.labelSemi, { marginTop: -2 }]}>
+              By <Link href={recipe.source_url}>"{recipe.source_name}"</Link>
+            </ThemedText>
+          )}
           {recipe.description && (
             <TouchableOpacity
               onPress={() => setShowDescription(!showDescription)}>
-              <ThemedText style={FONTS.label}>
+              <ThemedText style={[FONTS.label, { paddingTop: 10 }]}>
                 {showDescription ? "> Hide ↑" : "> Read Description ↓"}
               </ThemedText>
             </TouchableOpacity>
@@ -156,13 +174,15 @@ const RecipeDetailsScreen = () => {
             <TouchableOpacity
               style={[
                 styles.tabButton,
-                tab === "ingredients" && styles.activeTab,
+                tab === "ingredients" && styles.activeTab, // apply activeTab style
+                tab === "ingredients" && { borderBottomColor: theme.yellow }, // override border color                ,
               ]}
               onPress={() => setTab("ingredients")}>
               <Text
                 style={[
-                  styles.tabText,
-                  tab === "ingredients" && styles.activeTabText,
+                  FONTS.h4,
+                  { color: theme.gray },
+                  tab === "ingredients" && { color: theme.primary },
                 ]}>
                 Ingredients
               </Text>
@@ -170,13 +190,15 @@ const RecipeDetailsScreen = () => {
             <TouchableOpacity
               style={[
                 styles.tabButton,
-                tab === "instructions" && styles.activeTab,
+                tab === "instructions" && styles.activeTab, // apply activeTab style
+                tab === "instructions" && { borderBottomColor: theme.yellow }, // override border color
               ]}
               onPress={() => setTab("instructions")}>
               <Text
                 style={[
-                  styles.tabText,
-                  tab === "instructions" && styles.activeTabText,
+                  FONTS.h4,
+                  { color: theme.gray },
+                  tab === "instructions" && { color: theme.primary },
                 ]}>
                 Instructions
               </Text>
@@ -205,13 +227,36 @@ const RecipeDetailsScreen = () => {
 };
 
 export default RecipeDetailsScreen;
+
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     alignItems: "center",
     backgroundColor: "#fff",
     marginTop: spacingY._50,
     borderTopRadius: 10,
+  },
+  imageWrapper: {
+    position: "absolute",
+    alignSelf: "center",
+    marginTop: -50,
+  },
+  imagePlaceholder: {
+    backgroundColor: "#ccc",
+    borderRadius: 75,
+    width: 100,
+    height: 100,
+    overflow: "hidden",
+    borderWidth: 3,
+    borderColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 4,
+  },
+  image: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
   },
   timesContainer: {
     flexDirection: "row",
@@ -224,24 +269,16 @@ const styles = StyleSheet.create({
   tabs: {
     flexDirection: "row",
     marginBottom: 16,
+    borderBottomWidth: 1,
+    borderColor: "rgba(0, 0, 0, 0.1)", // subtle border
   },
   tabButton: {
     flex: 1,
     paddingVertical: 10,
-    borderRadius: 25,
-    backgroundColor: "#eee",
-    marginHorizontal: 5,
     alignItems: "center",
   },
   activeTab: {
-    backgroundColor: "#4f46e5",
-  },
-  tabText: {
-    color: "#555",
-    fontWeight: "600",
-  },
-  activeTabText: {
-    color: "#fff",
+    borderBottomWidth: 3,
   },
   content: {
     width: "100%",

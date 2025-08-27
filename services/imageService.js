@@ -10,6 +10,19 @@ export const getSupabaseFileUrl = (filePath) => {
   return null;
 };
 
+export const getRecipeImageSrc = (imagePath) => {
+  if (!imagePath || imagePath === null || imagePath === "undefined") {
+    return require("@/assets/images/neptune-placeholder-48.jpg");
+  }
+
+  // If it's already a full URI (e.g., picked locally or already public)
+  if (imagePath.startsWith("http") || imagePath.startsWith("file")) {
+    return { uri: imagePath };
+  }
+
+  return getSupabaseFileUrl(imagePath);
+};
+
 export const getUserImageSrc = (imagePath) => {
   if (!imagePath || imagePath === null || imagePath === "undefined") {
     return require("@/assets/images/little-chef-plate.jpg");
