@@ -5,26 +5,43 @@ import {
   StepRow,
   TagSelector,
 } from "@/components/forms";
+import { useLocalSearchParams } from "expo-router";
+
 import SafeScreen from "@/components/SafeScreen";
 import ThemedText from "@/components/theme/ThemedText";
 import { FONTS, spacingY } from "@/constants/theme";
 import { useTheme } from "@/context/ThemeContext";
+import useUnsavedChangesWarning from "@/hooks/useUnsavedChangesWarning";
 import { verticalScale } from "@/utils/styling";
 import { RecipeSchema } from "@/utils/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useEffect, useMemo } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
-import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Alert, Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Btn } from "../../components/buttons";
 import Header from "../../components/common/Header";
 import SubHeader from "../../components/common/SubHeader";
+
 import { useAuth } from "../../context/AuthContext";
 import { createAndGetRecipe } from "../../services/recipeService";
 const CreateRecipeScreen = () => {
   const queryClient = useQueryClient();
+  const { importKey } = useLocalSearchParams();
 
+  const { data: importedRecipe } = useQuery({
+    queryKey: ["importedRecipe", importKey],
+    queryFn: () => {
+      // This reads cached data synchronously from React Query's internal cache
+      return queryClient.getQueryData(["importedRecipe", importKey]);
+    },
+    enabled: !!importKey,
+    staleTime: Infinity,
+  });
+  console.log(importedRecipe);
+  // const { importedRecipe } = useLocalSearchParams();
+  // const parsedRecipe = importedRecipe ? JSON.parse(importedRecipe) : null;
   const router = useRouter();
   const { theme, isLightTheme } = useTheme();
   const { user } = useAuth();
@@ -34,7 +51,8 @@ const CreateRecipeScreen = () => {
     watch,
     setValue,
     resetField,
-    formState: { errors },
+    reset,
+    formState: { errors, isDirty },
   } = useForm({
     resolver: zodResolver(RecipeSchema),
     mode: "onSubmit",
@@ -47,10 +65,80 @@ const CreateRecipeScreen = () => {
       cookTime: "",
       totalTime: "",
       ingredients: [{ name: "", quantity: "" }],
-      steps: [{ step_number: 0, instruction: "" }],
+      steps: [{ step_number: 1, instruction: "" }],
       tags: [],
+      sourceName: "",
+      sourceUrl: "",
+      imageUrl: "",
     },
   });
+
+  // warning message if form hasn't been saved
+  useUnsavedChangesWarning(isDirty);
+
+  const mapTags = (apiTags, isVegan, isVegetarian) => {
+    const tagMap = {
+      "main dish": "main",
+      "side dish": "sides",
+      dessert: "dessert",
+    };
+
+    const mapped = apiTags
+      .map((tag) => tagMap[tag.toLowerCase()])
+      .filter(Boolean);
+
+    if (isVegan) mapped.push("vegan");
+    if (isVegetarian) mapped.push("vegetarian");
+
+    return mapped;
+  };
+
+  const handleImport = () => {
+    const stripHtml = (html) => html.replace(/<\/?[^>]+(>|$)/g, "");
+    const plainDescription = stripHtml(importedRecipe?.summary || "");
+
+    // Usage
+    const importedTags = mapTags(
+      importedRecipe.dishTypes || [],
+      importedRecipe.vegan,
+      importedRecipe.vegetarian
+    );
+
+    reset({
+      name: importedRecipe.title || "",
+      description: plainDescription || "",
+      prepTime:
+        importedRecipe.preparationMinutes !== null
+          ? String(importedRecipe.preparationMinutes)
+          : "",
+      cookTime:
+        importedRecipe.cookingMinutes !== null
+          ? String(importedRecipe.cookingMinutes)
+          : "",
+      totalTime: importedRecipe.readyInMinutes || "",
+      ingredients: importedRecipe.extendedIngredients?.map((ing) => ({
+        name: ing.name,
+        quantity: `${ing.amount} ${ing.unit}`.trim(),
+      })) || [{ name: "", quantity: "" }],
+      steps: importedRecipe.analyzedInstructions?.[0]?.steps?.map(
+        (step, index) => ({
+          step_number: index - 1,
+          instruction: step.step,
+        })
+      ) || [{ step_number: 0, instruction: "" }],
+      tags: importedTags || [],
+      sourceUrl:
+        importedRecipe.sourceUrl || importedRecipe.spoonacularSourceUrl || "",
+      sourceName: importedRecipe.sourceName || "",
+      imageUrl: importedRecipe.image || "",
+    });
+  };
+
+  useEffect(() => {
+    if (importedRecipe) {
+      handleImport();
+    }
+  }, [importedRecipe, reset]);
 
   /* Times */
   const prepTime = watch("prepTime");
@@ -79,7 +167,7 @@ const CreateRecipeScreen = () => {
   const firstIngredientError = errors.ingredients?.find(
     (item) => item?.name?.message || item?.quantity?.message
   );
-
+  console.log("imported recipe", importedRecipe);
   /* Steps */
   const {
     fields: stepFields,
@@ -109,7 +197,7 @@ const CreateRecipeScreen = () => {
     onSuccess: (newRecipe) => {
       console.log("Recipe created!", newRecipe);
       queryClient.invalidateQueries({ queryKey: ["recipes", user.id] }); // refetch all recipes
-      router.back();
+      router.push("/");
     },
     onError: (err) => {
       console.error("Recipe creation failed:", err);
@@ -131,13 +219,32 @@ const CreateRecipeScreen = () => {
 
   return (
     <SafeScreen paddingHorizontal>
-      <Header title="Create Recipe" showBackButton></Header>
+      <Header
+        title="Create Recipe"
+        showBackButton
+        isDirty={isDirty}
+        showImport={true}></Header>
+      {/* <Btn
+        title="IMPORT RECIPE"
+        onPress={() => router.push("import-recipe")}></Btn> */}
       <ScrollView
         contentContainerStyle={{ gap: 10 }}
         showsVerticalScrollIndicator={false}>
         {/*Basic Info Section */}
         <View>
+          {importedRecipe && (
+            <>
+              <ThemedText>
+                Imported successfully! Feel free to make changing before
+                submitting.
+              </ThemedText>
+              <Image
+                style={styles.tinyImage}
+                source={importedRecipe.image}></Image>
+            </>
+          )}
           <SubHeader>Basic Info</SubHeader>
+
           <InputField
             name="name"
             control={control}
@@ -267,5 +374,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+  },
+  tinyLogo: {
+    width: 50,
+    height: 50,
   },
 });

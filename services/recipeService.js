@@ -28,7 +28,7 @@ export const getRecipe = async (id) => {
   };
 };
 
-// fetch basic info for list: name, id, totalTime, favorite, tags
+// fetch basic info for list: name, id, totalTime, favorite, tags + ingredient names for search
 export const getAllRecipes = async (userId) => {
   try {
     const { data, error } = await supabase
@@ -36,6 +36,7 @@ export const getAllRecipes = async (userId) => {
       .select(
         `
         *,
+        recipe_ingredients (name),
         user_favorites (
           profile_id
         )
@@ -49,6 +50,7 @@ export const getAllRecipes = async (userId) => {
 
     const recipes = data.map((recipe) => ({
       ...recipe,
+      ingredients: recipe.recipe_ingredients || [],
       isFavorite:
         Array.isArray(recipe.user_favorites) &&
         recipe.user_favorites.length > 0,
@@ -109,6 +111,9 @@ export const addRecipeBasics = async (data, userId) => {
           cook_time: data.cookTime,
           total_time: data.totalTime,
           tags: data.tags || ["other"],
+          source_url: data.sourceUrl,
+          source_name: data.sourceName,
+          image_url: data.imageUrl,
         },
       ])
       .select()
@@ -120,7 +125,7 @@ export const addRecipeBasics = async (data, userId) => {
     if (!recipeId) {
       throw new Error("Recipe ID not found after insertion.");
     }
-
+    console.log("inserted data into database: ", recipeData);
     return recipeData;
   } catch (err) {
     throw new Error("Unexpected error during creating recipe.");
