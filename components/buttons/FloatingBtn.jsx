@@ -1,4 +1,4 @@
-import { COLORS } from "@/constants/theme";
+import { COLORS, spacingX } from "@/constants/theme";
 import { AntDesign } from "@expo/vector-icons";
 import { Pressable, StyleSheet } from "react-native";
 
@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.yellow,
     position: "absolute",
     bottom: 150,
-    right: 20,
+    right: spacingX._20,
     width: 56,
     height: 56,
     borderRadius: 28,
