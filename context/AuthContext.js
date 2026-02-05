@@ -19,8 +19,10 @@ export const AuthProvider = ({ children }) => {
 
     const initUser = async (session) => {
       const userId = session?.user?.id;
-      if (!userId || userId === lastFetchedId) return;
-
+      if (!userId || userId === lastFetchedId) {
+        setLoading(false);
+        return;
+      }
       console.log("Fetching profile for:", userId);
       lastFetchedId = userId;
 
