@@ -2,6 +2,7 @@ import Avatar from "@/components/common/Avatar";
 import ThemedText from "@/components/theme/ThemedText";
 import { FONTS, spacingY } from "@/constants/theme.js";
 import { useTheme } from "@/context/ThemeContext";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { Image, Pressable, StyleSheet, View } from "react-native";
 import BackBtn from "../buttons/BackBtn";
@@ -13,13 +14,15 @@ const Header = ({
   avatar,
   showAvatar = false,
   style = {},
+  isDirty = false,
+  showImport = false,
 }) => {
   const { theme } = useTheme();
   return (
     <View style={[styles.container]}>
       <View style={[styles.leftSide, style]}>
         {showBackButton ? (
-          <BackBtn />
+          <BackBtn isDirty={isDirty} />
         ) : (
           <Image
             source={require("../../assets/images/pancakes-logo-sm.png")}
@@ -34,6 +37,17 @@ const Header = ({
           onPress={() => router.navigate("/account")}
           style={styles.rightSide}>
           <Avatar size={45} uri={avatar} />
+        </Pressable>
+      )}
+      {showImport && (
+        <Pressable
+          onPress={() => router.navigate("/import-recipe")}
+          style={styles.rightSide}>
+          <MaterialCommunityIcons
+            name="file-import-outline"
+            size={25}
+            color={theme.text}
+          />
         </Pressable>
       )}
     </View>

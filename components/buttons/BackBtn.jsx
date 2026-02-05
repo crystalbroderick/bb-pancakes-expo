@@ -1,12 +1,33 @@
 import { COLORS } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { StyleSheet, TouchableOpacity } from "react-native";
-const BackBtn = ({ style, iconSize = 20 }) => {
+import { Alert, StyleSheet, TouchableOpacity } from "react-native";
+const BackBtn = ({ style, iconSize = 20, isDirty }) => {
   const router = useRouter();
+  console.log("dirty bcak button?", isDirty); // this always returns false, even if form says true
+
+  const onBackPress = () => {
+    if (isDirty) {
+      Alert.alert(
+        "Discard changes?",
+        "You have unsaved changes. Are you sure you want to leave and lose them?",
+        [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "Discard",
+            style: "destructive",
+            onPress: () => router.back(),
+          },
+        ]
+      );
+    } else {
+      router.back();
+    }
+  };
+
   return (
     <TouchableOpacity
-      onPress={() => router.back()}
+      onPress={() => onBackPress()}
       style={[styles.button, style]}
       hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}>
       <Ionicons

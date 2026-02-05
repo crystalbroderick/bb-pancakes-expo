@@ -78,11 +78,14 @@ export default function EditAccountScreen() {
       router.back();
     }
   };
-
+  console.log(loading);
   let imageSource = localAvatarUri || user.avatar_url;
   return (
     <ModalWrapper bg={theme.background}>
-      <Header title="Update Account" showBackButton></Header>
+      <Header
+        title="Update Account"
+        showBackButton
+        isDirty={isFormDirty()}></Header>
 
       <ScrollView contentContainerStyle={styles.container}>
         <View style={{ alignItems: "center" }}>
