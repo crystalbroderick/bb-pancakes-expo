@@ -109,20 +109,20 @@ export const FONTS = {
     color: COLORS.yellow,
   },
   h1: {
-    fontSize: 28,
+    fontSize: 20,
     fontFamily: "Mont_bold",
     color: COLORS.yellow,
   },
   h2: {
-    fontSize: 22,
+    fontSize: 18,
     fontFamily: "Mont_bold",
   },
   h3: {
-    fontSize: 20,
+    fontSize: 16,
     fontFamily: "Mont_semi",
   },
   h4: {
-    fontSize: 18,
+    fontSize: 14,
     fontFamily: "Mont_semi",
   },
   pageTitle: {
@@ -131,22 +131,22 @@ export const FONTS = {
   },
   body: {
     fontFamily: "Mont",
-    fontSize: 16,
+    fontSize: 14,
   },
   caption: {
     fontSize: 12,
     fontFamily: "Cherry",
   },
   labelSemi: {
-    fontSize: 14,
+    fontSize: 12,
     fontFamily: "Mont_semi",
   },
   label: {
-    fontSize: 14,
+    fontSize: 12,
     fontFamily: "Mont",
   },
   buttonText: {
-    fontSize: 14,
+    fontSize: 12,
     fontFamily: "Mont_bold",
     textTransform: "uppercase",
   },

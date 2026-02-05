@@ -44,7 +44,7 @@ export default function TabsLayout() {
                 shadowOpacity: 0.1,
                 shadowRadius: 5,
                 elevation: 10,
-                height: 90,
+                height: 70,
               },
             ]}>
             {(() => {
